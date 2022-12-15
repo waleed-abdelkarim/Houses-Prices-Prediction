@@ -1,4 +1,4 @@
-# Regression-Live
+# Houses-Prices-Prediction
 
 
 This repo is a direct application of the course: [End-to-End Machine Learning Projects](https://www.udemy.com/course/full-machine-learning-projects/), i Just modified a little.
