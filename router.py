@@ -7,7 +7,7 @@ import plotly.express as px
 import plotly
 import json
 
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify, make_response
 
 
 from utils import preprocess_new
@@ -47,8 +47,6 @@ def home():
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
     if request.method == 'POST': 
-        print(11)
-        print('11', request.form.keys)
         longitude = float(request.form['longitude'])
         latitude = float(request.form['latitude'])
         medianAge = float(request.form['medianAge'])
@@ -79,12 +77,11 @@ def predict():
         y_pred_new = model.predict(X_processed)
         y_pred_new = '{:.3f}'.format(y_pred_new[0])
 
-        return render_template('predict.html', pred_val=y_pred_new)
+        # return the prediction as a json
+        return render_template('predict.html', pred_val=y_pred_new, medianAge=medianAge, totalRooms=totalRooms, totalbedrooms=totalbedrooms, population=population, households=households, medianIncome=medianIncome, oceanProximity=oceanProximity, longitude=longitude, latitude=latitude)
     else:
         return render_template('predict.html')
  
-
-
 
 
 

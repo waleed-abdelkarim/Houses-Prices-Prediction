@@ -3,24 +3,80 @@
 {% block head %}
 
 <title>Predict</title>
-
+<script src='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
 {% endblock %}
 
 {% block body %}
 
-<h2 class="pt-5"> Predict Page </h2>
+<h2 class="pt-5 mb-5"> Predict Page </h2>
 
-<form action="/predict" , method="POST">
-  <div class="form-row">
+<div class="d-flex justify-content-center align-items-center mb-5">
+  <div class="d-flex justify-content-center align-items-center"
+    style="height: 50px; min-width: 350px; background-color: rgba(0, 177, 38, 0.377); border-radius: 1em;">
+    <h5> House prediction is : {{ pred_val }}</h5>
+  </div>
+</div>
+
+<form action="/predict" , method="POST" id="pred-form">
+
+  <div class="container mb-5">
+    <h5>Please select house location on the map</h5>
+    
+    <div style='width: 100%; min-height: 50px; background-color: beige'>
+    <p>
+      This model is trained on the data from California. Please select a location within California.
+      <br>
+      Other locations will work but the prediction will not be accurate.
+    </p>
+    </div>
+
+    <div id='map' style='width: 100%; height: 500px;'></div>
+    <script>
+      let mapMarkers = []
+      mapboxgl.accessToken = 'pk.eyJ1Ijoid29haSIsImEiOiJjbGM0b3J1amUxY2YyM3BwcTFvaml1dWRwIn0.zVX2idy-2HE9IAVNgs8F7w';
+      var map = new mapboxgl.Map({
+        container: 'map',
+        style: 'mapbox://styles/mapbox/streets-v11',
+        center: [-119.4494, 37.1661], // starting position
+        zoom: 4, // starting zoom
+      });
+
+      map.on('load', function () {
+        const marker = new mapboxgl.Marker()
+        .setLngLat([{{longitude}}, {{latitude}}])
+        .addTo(map);
+      mapMarkers.push(marker);
+      });
+   
+      
+
+
+      map.on('click', function (e) {
+        mapMarkers.forEach((marker) => marker.remove())
+
+        const marker = new mapboxgl.Marker()
+          .setLngLat([e.lngLat.lng, e.lngLat.lat])
+          .addTo(map);
+        mapMarkers.push(marker);
+
+        document.getElementById('longitude').value = e.lngLat.lng;
+        document.getElementById('latitude').value = e.lngLat.lat;
+      });
+    </script>
+  </div>
+
+
+  <div class="form-row" style="display: none;">
     <div class="form-group col-md-6">
       <label>Longitude</label>
-      <input type="number" step="0.0001" class="form-control" id="longitude" name="longitude" placeholder="Enter Longitude">
+      <input type="text" class="form-control" id="longitude" name="longitude" placeholder="Enter Longitude" required>
       <small id="longRequired" class="'form-text text-muted">This field is required</small>
     </div>
 
     <div class="form-group col-md-6">
       <label for="latitude">Latitude</label>
-      <input type="number" step="0.0001" class="form-control" id="latitude" name="latitude" placeholder="Enter Latitude">
+      <input type="text" class="form-control" id="latitude" name="latitude" placeholder="Enter Latitude" required>
       <small id="latRequired" class="form-text text-muted">This field is required</small>
     </div>
   </div>
@@ -28,13 +84,15 @@
   <div class="form-row">
     <div class="form-group col-md-6">
       <label for="medianAge">Housing Median Age</label>
-      <input type="number" step="0.0001" class="form-control" id="medianAge" name="medianAge" placeholder="Enter Housing Median Age">
-      <small id="ageRequired" class="'form-text text-muted">This field is required</small>
+      <input type="number" step="0.0001" class="form-control" id="medianAge" name="medianAge"
+        placeholder="Enter Housing Median Age" pattern="[0-9]+" minlength="1" required value={{ medianAge }}>
+      <small id="ageRequired" class="form-text text-muted">This field is required</small>
     </div>
 
     <div class="form-group col-md-6">
       <label for="totalRooms">Total Rooms</label>
-      <input type="number" class="form-control" id="totalRooms" name="totalRooms" placeholder="Enter Total Rooms">
+      <input type="number" class="form-control" id="totalRooms" name="totalRooms" placeholder="Enter Total Rooms"
+        pattern="[0-9]+" minlength="1" required value={{ totalRooms }}>
       <small id="roomsRequired" class="form-text text-muted">This field is required</small>
     </div>
   </div>
@@ -42,13 +100,15 @@
   <div class="form-row">
     <div class="form-group col-md-6">
       <label for="bedRooms">Total Bed Rooms</label>
-      <input type="number" class="form-control" id="bedRooms" name="bedRooms" placeholder="Enter Total Bed Rooms">
+      <input type="number" class="form-control" id="bedRooms" name="bedRooms" placeholder="Enter Total Bed Rooms"
+        pattern="[0-9]+" minlength="1" required value={{ totalbedrooms }}>
       <small id="bedRequired" class="'form-text text-muted">This field is required</small>
     </div>
 
     <div class="form-group col-md-6">
       <label for="population">Population</label>
-      <input type="number" step="0.0001" class="form-control" id="population" name="population" placeholder="Enter Population">
+      <input type="number" step="0.0001" class="form-control" id="population" name="population"
+        placeholder="Enter Population" pattern="[+-]?([0-9]*[.])?[0-9]+" minlength="1" required value={{ population }}>
       <small id="populationRequired" class="form-text text-muted">This field is required</small>
     </div>
   </div>
@@ -56,13 +116,16 @@
   <div class="form-row">
     <div class="form-group col-md-6">
       <label for="household">Household</label>
-      <input type="number" step="0.0001" class="form-control" id="household" name="household" placeholder="Enter Household">
+      <input type="number" step="0.0001" class="form-control" id="household" name="household"
+        placeholder="Enter Household" required value={{ households }}>
       <small id="householdRequired" class="'form-text text-muted">This field is required</small>
     </div>
 
     <div class="form-group col-md-6">
       <label for="medianIncome">Median Income</label>
-      <input type="number" step="0.0001" class="form-control" id="medianIncome" name="medianIncome" placeholder="Enter Median Income">
+      <input type="number" step="0.0001" class="form-control" id="medianIncome" name="medianIncome"
+        placeholder="Enter Median Income" pattern="[+-]?([0-9]*[.])?[0-9]+" minlength="1" required value={{ medianIncome
+        }}>
       <small id="incomeRequired" class="form-text text-muted">This field is required</small>
     </div>
   </div>
@@ -70,7 +133,7 @@
   <div class="form-row">
     <div class="form-group col-md-6">
       <label for="oceanProximity">Household</label>
-      <select class="form-control" id="oceanProximity" name="oceanProximity" >
+      <select class="form-control" id="oceanProximity" name="oceanProximity" value={{ oceanProximity }}>
         <option>INLAND</option>
         <option>NEAR BAY</option>
         <option>1H OCEAN</option>
@@ -81,9 +144,10 @@
     </div>
 
   </div>
-
-  <button type="submit" class="btn btn-primary">Predict</button>
-  <h5> House prediction is :    {{ pred_val }}</h5>
+  <div class="form-row justify-content-center mb-5">
+    <button type="submit" class="btn btn-success"
+      style="height:50px; min-width: 350px; background-color: rgba(0, 177, 38, 0.377); border-radius: 1em">Predict</button>
+  </div>
 </form>
 
 {% endblock %}
