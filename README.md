@@ -9,4 +9,8 @@ This repo is a direct application of the course: [End-to-End Machine Learning Pr
 
 
 
-![2022-12-14_183347](https://user-images.githubusercontent.com/65503195/207893661-6f712bc7-05c0-4134-9a17-ca8493352651.png)
+![2022-12-26_203152](https://user-images.githubusercontent.com/65503195/209572023-1d810d8d-42b3-4c6b-a0ae-bb5e194c3080.png)
+
+### Example
+
+![2022-12-26_203710](https://user-images.githubusercontent.com/65503195/209572213-bf18c5d2-80b7-42df-90cd-7d487a204be9.png)
